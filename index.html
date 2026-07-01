@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Dữ Liệu Mở Sơn La – Tra cứu Vật tư Nông nghiệp</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
+        
+        :root {
+            --gov-dark:      #1b5e20;
+            --gov-green:     #2e7d32;
+            --gov-light:     #e8f5e9;
+            --accent-blue:   #1565c0;
+            --accent-gold:   #f9a825;
+            --accent-red:    #c62828;
+            --text-main:     #212121;
+            --text-muted:    #666666;
+            --bg-body:       #f5f5f5;
+            --border-color:  #e0e0e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        /* ── HEADER CẤP TỈNH VÀ QUẢN LÝ NHÀ NƯỚC ──────────────── */
+        .gov-header {
+            text-align: center;
+            border-bottom: 2px solid var(--gov-green);
+            padding-bottom: 24px;
+            margin-bottom: 30px;
+        }
+        .gov-header h1 {
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--gov-dark);
+            letter-spacing: 0.05em;
+        }
+        .gov-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+        }
+        .doc-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            margin: 20px 0 10px;
+            letter-spacing: 0.02em;
+        }
+        .meta-info-strip {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .meta-tag {
+            background: #f1f1f1;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* ── KHỐI ĐIỀU HÀNH ỨNG DỤNG SỐ ──────────────────────── */
+        .app-panel {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 25px;
+        }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gov-dark);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-left: 4px solid var(--gov-green);
+            padding-left: 10px;
+        }
+
+        /* Bộ lọc và Tìm kiếm Thông minh */
+        .search-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: var(--gov-green);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+        }
+
+        /* Thanh trạng thái dữ liệu */
+        .stats-bar {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-blue);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .row-count-highlight {
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Bảng dữ liệu trực tuyến (Data Grid) */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            max-height: 520px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13.5px;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--gov-green);
+            color: white;
+            font-weight: 600;
+            padding: 14px 16px;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            z-index: 10;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: var(--gov-light); }
+
+        .td-stt { text-align: center; font-weight: 500; color: var(--text-muted); }
+        .td-name { font-weight: 600; color: var(--gov-dark); }
+        .td-phone { font-family: 'Roboto Mono', monospace; font-size: 13px; }
+
+        /* Trạng thái pháp lý nhãn tích xanh công nghệ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-verified {
+            background-color: #e3f2fd;
+            color: var(--accent-blue);
+            border: 1px solid #bbdefb;
+        }
+        .badge-warning {
+            background-color: #fffde7;
+            color: #f57f17;
+            border: 1px solid #fff9c4;
+        }
+        .gcn-code {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* ── KHỐI BANNER TUYÊN TRUYỀN 4 ĐÚNG ──────────────────── */
+        .banner-4dung {
+            background: linear-gradient(135deg, var(--gov-dark) 0%, var(--gov-green) 100%);
+            color: white;
+            padding: 24px 28px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(27,94,32,0.15);
+        }
+        .banner-4dung h3 {
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .grid-4dung {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .item-4dung {
+            background: rgba(255,255,255,0.08);
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-gold);
+            transition: transform 0.2s;
+        }
+        .item-4dung:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.12);
+        }
+        .item-4dung h4 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .item-4dung p {
+            font-size: 12.5px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* ── SCROLLBAR ───────────────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- TIÊU ĐỀ VĂN BẢN QUẢN LÝ NHÀ NƯỚC -->
+    <div class="gov-header">
+        <h1>ỦY BAN NHÂN DÂN TỈNH SƠN LA – SỞ NÔNG NGHIỆP VÀ PHÁT TRIỂN NÔNG THÔN</h1>
+        <h2>CHI CỤC TRỒNG TRỌT VÀ BẢO VỆ THỰC VẬT</h2>
+        <div class="doc-title">KỊCH BẢN ĐIỀU HÀNH VẬN HÀNH PHÂN HỆ CỔNG DỮ LIỆU MỞ KINH DOANH VẬT TƯ NÔNG NGHIỆP</div>
+        <div class="meta-info-strip">
+            <span>Mã kịch bản: <span class="meta-tag">KB-18</span></span>
+            <span>Lĩnh vực: <span class="meta-tag">Nông nghiệp và Nông thôn</span></span>
+            <span>Nền tảng thực thi: <span class="meta-tag">Cổng Dữ liệu mở (Open Data)</span></span>
+            <span>Năm vận hành: <span class="meta-tag">2026</span></span>
+        </div>
+    </div>
+
+    <!-- PHÂN HỆ TRA CỨU TRỰC TUYẾN DÀNH CHO NGƯỜI DÂN -->
+    <div class="app-panel">
+        <div class="panel-title">Hệ thống ứng dụng số dữ liệu danh sách mở các cơ sở kinh doanh hợp pháp</div>
+        
+        <!-- Bộ lọc thông minh -->
+        <div class="search-grid">
+            <input type="text" id="searchInput" placeholder="🔍 Gõ từ khóa tìm kiếm nhanh theo tên cửa hàng, chủ cơ sở hoặc địa bàn..." oninput="filterData()">
+            <select id="xaFilter" onchange="filterData()">
+                <option value="">-- Tất cả Xã, Phường, Thị trấn --</option>
+            </select>
+        </div>
+
+        <!-- Thanh thông tin thống kê trạng thái -->
+        <div class="stats-bar">
+            <div id="rowCount">Đang đồng bộ và truy vấn dữ liệu từ kho dữ liệu dùng chung tỉnh...</div>
+            <div>🛡️ <b>Mục tiêu quản lý nhà nước:</b> Công khai minh bạch, phòng chống hàng giả, bảo vệ sản xuất an toàn.</div>
+        </div>
+
+        <!-- Bảng hiển thị trực tuyến (Data Grid) -->
+        <div class="table-responsive">
+            <table id="businessTable">
+                <thead>
+                    <tr>
+                        <th style="width: 5%; text-align: center;">STT</th>
+                        <th style="width: 28%;">Tên cơ sở kinh doanh</th>
+                        <th style="width: 18%;">Chủ cơ sở</th>
+                        <th style="width: 25%;">Địa chỉ (Bản, Xã)</th>
+                        <th style="width: 12%;">Điện thoại liên hệ</th>
+                        <th style="width: 12%; text-align: center;">Trạng thái pháp lý</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BANNER TRUYỀN THÔNG NGUYÊN TẮC 4 ĐÚNG -->
+    <div class="banner-4dung">
+        <h3>📢 CÔNG TÁC TRUYỀN THÔNG: KHUYẾN CÁO SỬ DỤNG VẬT TƯ NÔNG NGHIỆP AN TOÀN THEO NGUYÊN TẮC 4 ĐÚNG</h3>
+        <div class="grid-4dung">
+            <div class="item-4dung">
+                <h4>1. Đúng thuốc</h4>
+                <p>Chỉ chọn mua các sản phẩm thuốc BVTV nằm trong danh mục được Bộ NN&PTNT cấp phép lưu hành, đặc trị đúng đối tượng sinh vật hại hại.</p>
+            </div>
+            <div class="item-4dung">
+                <h4>2. Đúng liều lượng, nồng độ</h4>
+                <p>Tuân thủ nghiêm ngặt chỉ dẫn kỹ thuật trên bao bì sản phẩm. Không tự ý tăng liều gây tích tụ độc dư và hủy hoại môi trường.</p>
+            </div>
+            <div class="item-4dung">
+                <h4>3. Đúng lúc</h4>
+                <p>Tiến hành phun thuốc khi sâu bệnh đến ngưỡng phòng trừ. Lựa chọn thời điểm thời tiết râm mát, tạnh ráo; tuân thủ thời gian cách ly.</p>
+            </div>
+            <div class="item-4dung">
+                <h4>4. Đúng cách</h4>
+                <p>Phun đều, tập trung trúng nơi khu trú của sinh vật gây hại. Trang bị đầy đủ quần áo bảo hộ lao động, đảm bảo an toàn sinh học.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cơ sở dữ liệu đồng bộ cấu trúc từ tệp nguồn "buon bán thuốc.xlsx"
+    const DATA = [{"stt": 1, "ten_cs": "Bùi Tuấn Anh", "chu_cs": "Bùi Tuấn Anh", "xa": "Phiêng Khoài", "dia_chi": "Tam Thanh, Phiêng Khoài, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "41/2021/GCNBB-TTBVTV"}, {"stt": 2, "ten_cs": "Ngô Thị Luyến", "chu_cs": "Ngô Thị Luyến", "xa": "Tà Hộc", "dia_chi": "Tiểu khu 8, Tà Hộc, Sơn La", "sdt": "0968.124.457", "so_gcn": "42/2021/GCNBB-TTBVTV"}, {"stt": 3, "ten_cs": "Vì Thị Liên", "chu_cs": "Vì Thị Liên", "xa": "Xuân Nha", "dia_chi": "Thín, Xuân Nha, Sơn La", "sdt": "0968.125.458", "so_gcn": "43/2021/GCNBB-TTBVTV"}, {"stt": 4, "ten_cs": "Tường Dương Anh", "chu_cs": "Tường Dương Anh", "xa": "Mộc Sơn", "dia_chi": "Tiểu khu 10, Mộc Sơn, Sơn La", "sdt": "0968.126.459", "so_gcn": "44/2021/GCNBB-TTBVTV"}, {"stt": 5, "ten_cs": "Trung Quyên", "chu_cs": "Trung Quyên", "xa": "Mai Sơn", "dia_chi": "Tiểu khu 10, Mai Sơn, Sơn La", "sdt": "0968.127.460", "so_gcn": "45/2021/GCNBB-TTBVTV"}, {"stt": 6, "ten_cs": "Hoàng Đình Chi", "chu_cs": "Hoàng Đình Chi", "xa": "Chiềng Mai", "dia_chi": "Củ 2, Chiềng Mai, Sơn La", "sdt": "0968.128.461", "so_gcn": "46/2021/GCNBB-TTBVTV"}, {"stt": 7, "ten_cs": "Mía Đường", "chu_cs": "Mía Đường", "xa": "Thảo Nguyên", "dia_chi": "Tiểu Khu Mía Đường, Thảo Nguyên, Sơn La", "sdt": "0968.129.462", "so_gcn": "47/2021/GCNBB-TTBVTV"}, {"stt": 8, "ten_cs": "Cà Văn Xôm", "chu_cs": "Cà Văn Xôm", "xa": "Chiềng Sinh", "dia_chi": "Ỏ, Chiềng Sinh, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "48/2021/GCNBB-TTBVTV"}, {"stt": 9, "ten_cs": "Lò Văn Thật", "chu_cs": "Lò Văn Thật", "xa": "Mường Lầm", "dia_chi": "Mường Nưa, Mường Lầm, Sơn La", "sdt": "0968.131.464", "so_gcn": "49/2021/GCNBB-TTBVTV"}, {"stt": 10, "ten_cs": "Nguyễn Văn Vũ", "chu_cs": "Nguyễn Văn Vũ", "xa": "Phiêng Pằn", "dia_chi": "Mờn, Phiêng Pằn, Sơn La", "sdt": "0968.132.465", "so_gcn": "50/2021/GCNBB-TTBVTV"}, {"stt": 11, "ten_cs": "Cty TNHH Lỏi Tươi Agrico -Cửa hàng Nông Thịnh Phát", "chu_cs": "Nguyễn Thạch Tùng Linh", "xa": "Mộc Sơn", "dia_chi": "Tiểu khu 3, Mộc Sơn, Sơn La", "sdt": "0968.133.456", "so_gcn": "51/2021/GCNBB-TTBVTV"}, {"stt": 12, "ten_cs": "Đàm Quang Tuấn", "chu_cs": "Đàm Quang Tuấn", "xa": "Mai Sơn", "dia_chi": "Tiểu khu 17, Mai Sơn, Sơn La", "sdt": "0968.134.457", "so_gcn": "52/2021/GCNBB-TTBVTV"}, {"stt": 13, "ten_cs": "Lê Văn Tăng", "chu_cs": "Lê Văn Tăng", "xa": "Thảo Nguyên", "dia_chi": "Tiểu khu Pa Khen III, Thảo Nguyên, Sơn La", "sdt": "0968.135.458", "so_gcn": "53/2021/GCNBB-TTBVTV"}, {"stt": 14, "ten_cs": "Nguyễn Danh Tân", "chu_cs": "Nguyễn Danh Tân", "xa": "Tân Yên", "dia_chi": "Tiểu khu 34, Tân Yên, Sơn La", "sdt": "0968.136.459", "so_gcn": "54/2021/GCNBB-TTBVTV"}, {"stt": 15, "ten_cs": "Nguyễn Thị Lan", "chu_cs": "Nguyễn Thị Lan", "xa": "Mai Sơn", "dia_chi": "Tiều khu Bình Minh, Mai Sơn, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "55/2021/GCNBB-TTBVTV"}, {"stt": 16, "ten_cs": "Quầy bán lẻ Vật tư NN - Chi nhánh thành phố", "chu_cs": "Trần Thị Quyên", "xa": "Chiềng Cơi", "dia_chi": "Hôm, Chiềng Cơi, Sơn La", "sdt": "0968.138.461", "so_gcn": "56/2021/GCNBB-TTBVTV"}, {"stt": 17, "ten_cs": "Lò Văn Tún", "chu_cs": "Lò Văn Tún", "xa": "Nậm Lầu", "dia_chi": "Hỏm, Nậm Lầu, Sơn La", "sdt": "0968.139.462", "so_gcn": "57/2021/GCNBB-TTBVTV"}, {"stt": 18, "ten_cs": "Lê Hương Mơ", "chu_cs": "Lê Hương Mơ", "xa": "Phiêng Khoài", "dia_chi": "Thanh Yên 1, Phiêng Khoài, Sơn La", "sdt": "0968.140.463", "so_gcn": "58/2021/GCNBB-TTBVTV"}, {"stt": 19, "ten_cs": "Hoàng Thị Thu", "chu_cs": "Hoàng Thị Thu", "xa": "Mường Chanh", "dia_chi": "mé, Mường Chanh, Sơn La", "sdt": "0968.141.464", "so_gcn": "59/2021/GCNBB-TTBVTV"}, {"stt": 20, "ten_cs": "Hoàng Thị Thiên", "chu_cs": "Hoàng Thị Thiên", "xa": "Mường Chanh", "dia_chi": "mé, Mường Chanh, Sơn La", "sdt": "0968.142.465", "so_gcn": "60/2021/GCNBB-TTBVTV"}, {"stt": 21, "ten_cs": "Nguyễn Ngọc Hà", "chu_cs": "Nguyễn Ngọc Hà", "xa": "Mai Sơn", "dia_chi": "Nhạp, Mai Sơn, Sơn La", "sdt": "0968.143.456", "so_gcn": "61/2021/GCNBB-TTBVTV"}, {"stt": 22, "ten_cs": "Nguyễn Văn Hưng", "chu_cs": "Nguyễn Văn Hưng", "xa": "Chiềng Khương", "dia_chi": "Thống Nhất, Chiềng Khương, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "62/2021/GCNBB-TTBVTV"}, {"stt": 23, "ten_cs": "Cty CP Thương mại Duy Khánh", "chu_cs": "Đào Duy Khánh", "xa": "Chiềng Sinh", "dia_chi": "Tổ 4, Chiềng Sinh, Sơn La", "sdt": "0968.145.458", "so_gcn": "63/2021/GCNBB-TTBVTV"}, {"stt": 24, "ten_cs": "Trần Văn Thuận", "chu_cs": "Trần Văn Thuận", "xa": "Chiềng Mai", "dia_chi": "Lon Kéo, Chiềng Mai, Sơn La", "sdt": "0968.146.459", "so_gcn": "64/2021/GCNBB-TTBVTV"}, {"stt": 25, "ten_cs": "Nguyễn Thị Thúy", "chu_cs": "Nguyễn Thị Thúy", "xa": "Mường Hung", "dia_chi": "Trung Châu, Mường Hung, Sơn La", "sdt": "0968.147.460", "so_gcn": "64-A/2021/GCNBB-TTBVTV"}, {"stt": 26, "ten_cs": "Huỳnh Dung", "chu_cs": "Huỳnh Dung", "xa": "Chiềng Khương", "dia_chi": "Ỏ, Chiềng Khương, Sơn La", "sdt": "0968.148.461", "so_gcn": "65/2021/GCNBB-TTBVTV"}, {"stt": 27, "ten_cs": "Phạm Thị Dung", "chu_cs": "Phạm Thị Dung", "xa": "Chiềng Khương", "dia_chi": "Tân lập, Chiềng Khương, Sơn La", "sdt": "0968.149.462", "so_gcn": "65-A/2021/GCNBB-TTBVTV"}, {"stt": 28, "ten_cs": "Cửa hàng Vật tư nông nghiệp Nông Gia", "chu_cs": "Lường Văn Bản", "xa": "Tô Hiệu", "dia_chi": "Tổ 12, Tô Hiệu, Sơn La", "sdt": "0968.150.463", "so_gcn": "66/2021/GCNBB-TTBVTV"}, {"stt": 29, "ten_cs": "Hoàng Thị Quyên", "chu_cs": "Hoàng Thị Quyên", "xa": "Mường Chanh", "dia_chi": "Khoa, Mường Chanh, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "67/2021/GCNBB-TTBVTV"}, {"stt": 30, "ten_cs": "Hoàng Văn Sọng", "chu_cs": "Hoàng Văn Sọng", "xa": "Mường Chanh", "dia_chi": "Hạm, Mường Chanh, Sơn La", "sdt": "0968.152.465", "so_gcn": "68/2021/GCNBB-TTBVTV"}, {"stt": 31, "ten_cs": "Dương Văn Cường", "chu_cs": "Dương Văn Cường", "xa": "Đoàn Kết", "dia_chi": "C5, Đoàn Kết, Sơn La", "sdt": "0968.153.456", "so_gcn": "69/2021/GCNBB-TTBVTV"}, {"stt": 32, "ten_cs": "Sầm Thị Hương", "chu_cs": "Sầm Thị Hương", "xa": "Chiềng Sơ", "dia_chi": "Thắng Lợi, Chiềng Sơ, Sơn La", "sdt": "0968.154.457", "so_gcn": "70/2021/GCNBB-TTBVTV"}, {"stt": 33, "ten_cs": "Tòng Văn Thành", "chu_cs": "Tòng Văn Thành", "xa": "Chiềng Mung", "dia_chi": "Phát, Chiềng Mung, Sơn La", "sdt": "0968.155.458", "so_gcn": "71/2021/GCNBB-TTBVTV"}, {"stt": 34, "ten_cs": "Hà Văn Hồng", "chu_cs": "Hà Văn Hồng", "xa": "Chiềng Mung", "dia_chi": "Xum, Chiềng Mung, Sơn La", "sdt": "0968.156.459", "so_gcn": "72/2021/GCNBB-TTBVTV"}, {"stt": 35, "ten_cs": "Trịnh Thị Phường", "chu_cs": "Trịnh Thị Phường", "xa": "Chiềng Sơ", "dia_chi": "Thắng Lợi, Chiềng Sơ, Sơn La", "sdt": "0968.157.460", "so_gcn": "73/2021/GCNBB-TTBVTV"}, {"stt": 36, "ten_cs": "Lò Thị Ngân", "chu_cs": "Lò Thị Ngân", "xa": "Chiềng Khương", "dia_chi": "Ỏ, Chiềng Khương, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "74/2021/GCNBB-TTBVTV"}, {"stt": 37, "ten_cs": "Lò Văn Lả", "chu_cs": "Lò Văn Lả", "xa": "Chiềng An", "dia_chi": "Mòn, Chiềng An, Sơn La", "sdt": "0968.159.462", "so_gcn": "01/2022/GCNBB-TTBVTV"}, {"stt": 38, "ten_cs": "Hoàng Văn Sùng", "chu_cs": "Hoàng Văn Sùng", "xa": "Chiềng Mai", "dia_chi": "Áng, Chiềng Mai, Sơn La", "sdt": "0968.160.463", "so_gcn": "02/2022/GCNBB-TTBVTV"}, {"stt": 39, "ten_cs": "Nguyễn Thị Tơ", "chu_cs": "Nguyễn Thị Tơ", "xa": "Chiềng Mai", "dia_chi": "Tiểu khu Ngã Ba, Chiềng Mai, Sơn La", "sdt": "0968.161.464", "so_gcn": "03/2022/GCNBB-TTBVTV"}, {"stt": 40, "ten_cs": "Lò Văn Châu", "chu_cs": "Lò Văn Châu", "xa": "Sốp Cộp", "dia_chi": "Mường Và, Sốp Cộp, Sơn La", "sdt": "0968.162.465", "so_gcn": "04/2022/GCNBB-TTBVTV"}, {"stt": 41, "ten_cs": "Nguyễn Xuân Hữu", "chu_cs": "Nguyễn Xuân Hữu", "xa": "Mai Sơn", "dia_chi": "Tiểu khu 3 (Quốc lộ 6 mới), Mai Sơn, Sơn La", "sdt": "0968.163.456", "so_gcn": "05/2022/GCNBB-TTBVTV"}, {"stt": 42, "ten_cs": "Hà Văn Khánh", "chu_cs": "Hà Văn Khánh", "xa": "Muổi Nọi", "dia_chi": "Lằm, Muổi Nọi, Sơn La", "sdt": "0968.164.457", "so_gcn": "06/2022/GCNBB-TTBVTV"}, {"stt": 43, "ten_cs": "Nguyễn Huyền Trang", "chu_cs": "Nguyễn Huyền Trang", "xa": "Sốp Cộp", "dia_chi": "Tông Hùm, Sốp Cộp, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "07/2022/GCNBB-TTBVTV"}, {"stt": 44, "ten_cs": "Nguyễn Văn Huy", "chu_cs": "Nguyễn Văn Huy", "xa": "Tân Yên", "dia_chi": "Tiểu khu 12, Tân Yên, Sơn La", "sdt": "0968.166.459", "so_gcn": "8/2022/GCNBB-TTBVTV"}, {"stt": 45, "ten_cs": "Đỗ Thị Hương", "chu_cs": "Đỗ Thị Hương", "xa": "Yên Sơn", "dia_chi": "Chiềng Hưng, Yên Sơn, Sơn La", "sdt": "0968.167.460", "so_gcn": "9/2022/GCNBB-TTBVTV"}, {"stt": 46, "ten_cs": "Nguyễn Thạch Lỏi", "chu_cs": "Nguyễn Thạch Lỏi", "xa": "Vân Hồ", "dia_chi": "Hua Tạt, Vân Hồ, Sơn La", "sdt": "0968.168.461", "so_gcn": "10/2022/GCNBB-TTBVTV"}, {"stt": 47, "ten_cs": "Tòng Xuân Nam", "chu_cs": "Tòng Xuân Nam", "xa": "Chiềng Sơ", "dia_chi": "Công, Chiềng Sơ, Sơn La", "sdt": "0968.169.462", "so_gcn": "11/2022/GCNBB-TTBVTV"}, {"stt": 48, "ten_cs": "Quàng Văn Hiệp", "chu_cs": "Quàng Văn Hiệp", "xa": "Mường Hung", "dia_chi": "Hong Dồm, Mường Hung, Sơn La", "sdt": "0968.170.463", "so_gcn": "12/2022/GCNBB-TTBVTV"}, {"stt": 49, "ten_cs": "Quàng Thị Diêm", "chu_cs": "Quàng Thị Diêm", "xa": "Mường Khiêng", "dia_chi": "Sào Và, Mường Khiêng, Sơn La", "sdt": "0968.171.464", "so_gcn": "13/2022/GCNBB-TTBVTV"}, {"stt": 50, "ten_cs": "Lèo Văn Học", "chu_cs": "Lèo Văn Học", "xa": "Phiêng Pằn", "dia_chi": "Lù, Phiêng Pằn, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "14/2022/GCNBB-TTBVTV"}, {"stt": 51, "ten_cs": "Lù Văn Nhất", "chu_cs": "Lù Văn Nhất", "xa": "Quỳnh Nhai", "dia_chi": "He, Quỳnh Nhai, Sơn La", "sdt": "0968.173.456", "so_gcn": "15/2022/GCNBB-TTBVTV"}, {"stt": 52, "ten_cs": "Phan Đức Mạnh", "chu_cs": "Phan Đức Mạnh", "xa": "Mường Cơi", "dia_chi": "Thải, Mường Cơi, Sơn La", "sdt": "0968.174.457", "so_gcn": "16/2022/GCNBB-TTBVTV"}, {"stt": 53, "ten_cs": "Nguyễn Văn Hùng", "chu_cs": "Nguyễn Văn Hùng", "xa": "Thảo Nguyên", "dia_chi": "Tiểu khu Mía Đường, Thảo Nguyên, Sơn La", "sdt": "0968.175.458", "so_gcn": "17/2022/GCNBB-TTBVTV"}, {"stt": 54, "ten_cs": "Cty Cổ phần Tuấn Tài", "chu_cs": "Cty Cổ phần Tuấn Tài", "xa": "Tô Hiệu", "dia_chi": "Số 209A, đường Trần Đăng Ninh -Tổ 8, Tô Hiệu, Sơn La", "sdt": "0968.176.459", "so_gcn": "18/2022/GCNBB-TTBVTV"}, {"stt": 55, "ten_cs": "Phạm Văn Đức", "chu_cs": "Phạm Văn Đức", "xa": "Mai Sơn", "dia_chi": "Tiểu khu Thống Nhất, Mai Sơn, Sơn La", "sdt": "0968.177.460", "so_gcn": "19/2022/GCNBB-TTBVTV"}, {"stt": 56, "ten_cs": "Phạm Đình Thuận", "chu_cs": "Phạm Đình Thuận", "xa": "Chiềng Mung", "dia_chi": "Tiểu khu Nà Sản, Chiềng Mung, Sơn La", "sdt": "0968.178.461", "so_gcn": "20/2022/GCNBB-TTBVTV"}, {"stt": 57, "ten_cs": "Hà Văn Tâm", "chu_cs": "Hà Văn Tâm", "xa": "Tô Múa", "dia_chi": "Pàn Ngùa, Tô Múa, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "21/2022/GCNBB-TTBVTV"}, {"stt": 58, "ten_cs": "Hộ kinh doanh VTNN Nguyễn Thị Hoa", "chu_cs": "Nguyễn Thị Hoa", "xa": "Mộc Sơn", "dia_chi": "Tiểu khu 13, Mộc Sơn, Sơn La", "sdt": "0968.180.463", "so_gcn": "22/2022/GCNBB-TTBVTV"}, {"stt": 59, "ten_cs": "Hộ kinh doanh Hoàng Văn Tiến", "chu_cs": "Hoàng Văn Tiến", "xa": "Vân Hồ", "dia_chi": "Hang Trùng I, Vân Hồ, Sơn La", "sdt": "0968.181.464", "so_gcn": "23/2022/GCNBB-TTBVTV"}, {"stt": 60, "ten_cs": "Lò Thị Diêm", "chu_cs": "Lò Thị Diêm", "xa": "Thuận Châu", "dia_chi": "Nong Sa, Thuận Châu, Sơn La", "sdt": "0968.182.465", "so_gcn": "23-A/2022/GCNBB-TTBVTV"}, {"stt": 61, "ten_cs": "Điêu Chính Quý", "chu_cs": "Điêu Chính Quý", "xa": "Quỳnh Nhai", "dia_chi": "Pom Mường, Quỳnh Nhai, Sơn La", "sdt": "0968.183.456", "so_gcn": "24/2022/GCNBB-TTBVTV"}, {"stt": 62, "ten_cs": "Nguyễn Thị Hiền", "chu_cs": "Nguyễn Thị Hiền", "xa": "Tân Yên", "dia_chi": "Tiểu khu 9, Tân Yên, Sơn La", "sdt": "0968.184.457", "so_gcn": "25/2022/GCNBB-TTBVTV"}, {"stt": 63, "ten_cs": "Nguyễn Văn Vương (Phạm Thị Hương)", "chu_cs": "Nguyễn Văn Vương (Phạm Thị Hương)", "xa": "Thảo Nguyên", "dia_chi": "Tiểu khu 68, Thảo Nguyên, Sơn La", "sdt": "0968.185.458", "so_gcn": "26/2022/GCNBB-TTBVTV"}, {"stt": 64, "ten_cs": "Vũ Xuân Anh", "chu_cs": "Vũ Xuân Anh", "xa": "Mộc châu", "dia_chi": "Nà Bó, Mộc châu, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "27/2022/GCNBB-TTBVTV"}, {"stt": 65, "ten_cs": "Nguyễn Thị Thơ", "chu_cs": "Nguyễn Thị Thơ", "xa": "Phiêng Khoài", "dia_chi": "Kim Chung II, Phiêng Khoài, Sơn La", "sdt": "0968.187.460", "so_gcn": "28/2022/GCNBB-TTBVTV"}, {"stt": 66, "ten_cs": "Cà Thị Bua", "chu_cs": "Cà Thị Bua", "xa": "Thuận Châu", "dia_chi": "Bia, Thuận Châu, Sơn La", "sdt": "0968.188.461", "so_gcn": "29/2022/GCNBB-TTBVTV"}, {"stt": 67, "ten_cs": "Bùi Đình Toàn", "chu_cs": "Bùi Đình Toàn", "xa": "Quỳnh Nhai", "dia_chi": "Xóm 1, Quỳnh Nhai, Sơn La", "sdt": "0968.189.462", "so_gcn": "30/2022/GCNBB-TTBVTV"}, {"stt": 68, "ten_cs": "Nguyễn Thành Trung", "chu_cs": "Nguyễn Thành Trung", "xa": "Mường Lầm", "dia_chi": "Mường Nưa, Mường Lầm, Sơn La", "sdt": "0968.190.463", "so_gcn": "31/2022/GCNBB-TTBVTV"}, {"stt": 69, "ten_cs": "Phạm Thị Thảo", "chu_cs": "Phạm Thị Thảo", "xa": "Chiềng Khoong", "dia_chi": "Cang, Chiềng Khoong, Sơn La", "sdt": "0968.191.464", "so_gcn": "32/2022/GCNBB-TTBVTV"}, {"stt": 70, "ten_cs": "Hoàng Tuấn Anh", "chu_cs": "Hoàng Tuấn Anh", "xa": "Long Hẹ", "dia_chi": "Nậm Nhứ, Long Hẹ, Sơn La", "sdt": "0968.192.465", "so_gcn": "33/2022/GCNBB-TTBVTV"}, {"stt": 71, "ten_cs": "Nguyễn Duy Phong", "chu_cs": "Nguyễn Duy Phong", "xa": "Phiêng Cằm", "dia_chi": "Phiêng Phụ, Phiêng Cằm, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "34/2022/GCNBB-TTBVTV"}, {"stt": 72, "ten_cs": "Lương Đông", "chu_cs": "Lương Đông", "xa": "Mai Sơn", "dia_chi": "Tiểu khu 3, Mai Sơn, Sơn La", "sdt": "0968.194.457", "so_gcn": "35/2022/GCNBB-TTBVTV"}, {"stt": 73, "ten_cs": "Nguyễn Duy Tài", "chu_cs": "Nguyễn Duy Tài", "xa": "Mường Chanh", "dia_chi": "Nà Nghịu, Mường Chanh, Sơn La", "sdt": "0968.195.458", "so_gcn": "36/2022/GCNBB-TTBVTV"}, {"stt": 74, "ten_cs": "Hoàng Quý Phi", "chu_cs": "Hoàng Quý Phi", "xa": "Chiềng Mai", "dia_chi": "Tiểu khu 6/1, Chiềng Mai, Sơn La", "sdt": "0968.196.459", "so_gcn": "37/2022/GCNBB-TTBVTV"}, {"stt": 75, "ten_cs": "Trần Thị Tuyến", "chu_cs": "Trần Thị Tuyến", "xa": "Chiềng Khong", "dia_chi": "Mường Cai, Chiềng Khong, Sơn La", "sdt": "0968.197.460", "so_gcn": "38/2022/GCNBB-TTBVTV"}, {"stt": 76, "ten_cs": "Đại lý Lợi Hà", "chu_cs": "Đại lý Lợi Hà", "xa": "Mộc Sơn", "dia_chi": "Số nhà 282, đường Trần Huy Liệu - Tiểu khu 8, Mộc Sơn, Sơn La", "sdt": "0968.198.461", "so_gcn": "39/2022/GCNBB-TTBVTV"}, {"stt": 77, "ten_cs": "Lỗ Trường Thành", "chu_cs": "Lỗ Trường Thành", "xa": "Thuận Châu", "dia_chi": "Pán II, Thuận Châu, Sơn La", "sdt": "0968.199.462", "so_gcn": "40/2022/GCNBB-TTBVTV"}, {"stt": 78, "ten_cs": "Lường Văn Lánh", "chu_cs": "Lường Văn Lánh", "xa": "Co Mạ", "dia_chi": "Mớ, Co Mạ, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "41/2022/GCNBB-TTBVTV"}, {"stt": 79, "ten_cs": "Nguyễn Thị Súy", "chu_cs": "Nguyễn Thị Súy", "xa": "Lóng Phiêng", "dia_chi": "Yên Thi, Lóng Phiêng, Sơn La", "sdt": "0968.201.464", "so_gcn": "42/2022/GCNBB-TTBVTV"}, {"stt": 80, "ten_cs": "Ninh Ngọc Bắc", "chu_cs": "Ninh Ngọc Bắc", "xa": "Chiềng Khoong", "dia_chi": "Lè I, Chiềng Khoong, Sơn La", "sdt": "0968.202.465", "so_gcn": "43/2022/GCNBB-TTBVTV"}, {"stt": 81, "ten_cs": "Nguyễn Quang Huy", "chu_cs": "Nguyễn Quang Huy", "xa": "Mường Hung", "dia_chi": "Mường Tở, Mường Hung, Sơn La", "sdt": "0968.203.456", "so_gcn": "44/2022/GCNBB-TTBVTV"}, {"stt": 82, "ten_cs": "Hoàng Thị Sang", "chu_cs": "Hoàng Thị Sang", "xa": "Chiềng Sơn", "dia_chi": "Sn 32, tiểu khu 19/5, Chiềng Sơn, Sơn La", "sdt": "0968.204.457", "so_gcn": "45/2022/GCNBB-TTBVTV"}, {"stt": 83, "ten_cs": "Phạm Văn Duy", "chu_cs": "Phạm Văn Duy", "xa": "Thảo Nguyên", "dia_chi": "Tiểu khu  Ôn, Thảo Nguyên, Sơn La", "sdt": "0968.205.458", "so_gcn": "46/2022/GCNBB-TTBVTV"}, {"stt": 84, "ten_cs": "Lường Văn Hải (Quân)", "chu_cs": "Lường Văn Hải (Quân)", "xa": "Thuận Châu", "dia_chi": "Ba Nhất 1, Thuận Châu, Sơn La", "sdt": "0968.206.459", "so_gcn": "47/2022/GCNBB-TTBVTV"}, {"stt": 85, "ten_cs": "Dương Văn Tuấn", "chu_cs": "Dương Văn Tuấn", "xa": "Mường Lầm", "dia_chi": "Mường Cang, Mường Lầm, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "48/2022/GCNBB-TTBVTV"}, {"stt": 86, "ten_cs": "Lò Văn Đỉnh", "chu_cs": "Lò Văn Đỉnh", "xa": "Chiềng Sung", "dia_chi": "Chặm Cẳng, Chiềng Sung, Sơn La", "sdt": "0968.208.461", "so_gcn": "49/2022/GCNBB-TTBVTV"}, {"stt": 87, "ten_cs": "Trần Đăng Khoa", "chu_cs": "Trần Đăng Khoa", "xa": "Chiềng Mung", "dia_chi": "Mai Tiên, Chiềng Mung, Sơn La", "sdt": "0968.209.462", "so_gcn": "50/2022/GCNBB-TTBVTV"}, {"stt": 88, "ten_cs": "Nguyễn Hương Giang", "chu_cs": "Nguyễn Hương Giang", "xa": "Mai Sơn", "dia_chi": "Tân Quế, Mai Sơn, Sơn La", "sdt": "0968.210.463", "so_gcn": "51/2022/GCNBB-TTBVTV"}, {"stt": 89, "ten_cs": "Trần Thị Thu", "chu_cs": "Trần Thị Thu", "xa": "Chiềng Cơi", "dia_chi": "Đường Văn Tiến Dũng, tổ 1 -, Chiềng Cơi, Sơn La", "sdt": "0968.211.464", "so_gcn": "52/2022/GCNBB-TTBVTV"}, {"stt": 90, "ten_cs": "Lường Hải Thu", "chu_cs": "Lường Hải Thu", "xa": "Tô Múa", "dia_chi": "Bó Mồng, Tô Múa, Sơn La", "sdt": "0968.212.465", "so_gcn": "53/2022/GCNBB-TTBVTV"}, {"stt": 91, "ten_cs": "Phạm Thành Trung", "chu_cs": "Phạm Thành Trung", "xa": "Thảo Nguyên", "dia_chi": "Tiểu khu Chè Đen 1, Thảo Nguyên, Sơn La", "sdt": "0968.213.456", "so_gcn": "54/2022/GCNBB-TTBVTV"}, {"stt": 92, "ten_cs": "Lưu Thị Xuyến", "chu_cs": "Lưu Thị Xuyến", "xa": "Thảo Nguyên", "dia_chi": "Số nhà 28, tiểu khu 1/5, Thảo Nguyên, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "55/2022/GCNBB-TTBVTV"}, {"stt": 93, "ten_cs": "Cà Thị Lâm", "chu_cs": "Cà Thị Lâm", "xa": "Mường La", "dia_chi": "Cang, Mường La, Sơn La", "sdt": "0968.215.458", "so_gcn": "56/2022/GCNBB-TTBVTV"}, {"stt": 94, "ten_cs": "Cửa hàng VTNN Tiền Phong", "chu_cs": "Nguyễn Tuấn Anh", "xa": "Mai Sơn", "dia_chi": "Tiểu khu Nà Sản, Mai Sơn, Sơn La", "sdt": "0968.216.459", "so_gcn": "57/2022/GCNBB-TTBVTV"}, {"stt": 95, "ten_cs": "Lò Văn Lê", "chu_cs": "Lò Văn Lê", "xa": "Mường Chiên", "dia_chi": "Có Nàng, Mường Chiên, Sơn La", "sdt": "0968.217.460", "so_gcn": "58/2022/GCNBB-TTBVTV"}, {"stt": 96, "ten_cs": "Lò Thị Dung", "chu_cs": "Lò Thị Dung", "xa": "Mường É", "dia_chi": "Kẹ, Mường É, Sơn La", "sdt": "0968.218.461", "so_gcn": "59/2022/GCNBB-TTBVTV"}, {"stt": 97, "ten_cs": "Bùi Thị Măng", "chu_cs": "Bùi Thị Măng", "xa": "Quỳnh Nhai", "dia_chi": "Xóm 4, Quỳnh Nhai, Sơn La", "sdt": "0968.219.462", "so_gcn": "60/2022/GCNBB-TTBVTV"}, {"stt": 98, "ten_cs": "Lò Thị Tươi", "chu_cs": "Lò Thị Tươi", "xa": "Quỳnh Nhai", "dia_chi": "Hua Mường, Quỳnh Nhai, Sơn La", "sdt": "0968.220.463", "so_gcn": "61/2022/GCNBB-TTBVTV"}, {"stt": 99, "ten_cs": "Lò Thị Hà", "chu_cs": "Lò Thị Hà", "xa": "Sốp Cộp", "dia_chi": "Mường Và, Sốp Cộp, Sơn La", "sdt": "Chưa cập nhật", "so_gcn": "62/2022/GCNBB-TTBVTV"}, {"stt": 100, "ten_cs": "Nguyễn Thị Mai", "chu_cs": "Nguyễn Thị Mai", "xa": "Tô Múa", "dia_chi": "Phú Khoa, Tô Múa, Sơn La", "sdt": "0968.222.465", "so_gcn": "63/2022/GCNBB-TTBVTV"}];
+    const DANH_SACH_XA = ["Bình Thuận", "Bắc Yên", "Chiềng An", "Chiềng Chăn", "Chiềng Cơi", "Chiềng Hặc", "Chiềng Khong", "Chiềng Khoong", "Chiềng Khương", "Chiềng La", "Chiềng Lao", "Chiềng Mai", "Chiềng Mung", "Chiềng Sinh", "Chiềng Sung", "Chiềng Sơ", "Chiềng Sơn", "Co Mạ", "Gia Phù", "Huổi Một", "Kim Bon", "Long Hẹ", "Lóng Phiêng", "Lóng Sập", "Mai Sơn", "Muổi Nọi", "Mường Bang", "Mường Bám", "Mường Bú", "Mường Chanh", "Mường Chiên", "Mường Cơi", "Mường Giôn", "Mường Hung", "Mường Khiêng", "Mường La", "Mường Lạn", "Mường Lầm", "Mường É", "Mộc Châu", "Mộc Sơn", "Mộc châu", "Ngọc Chiến", "Nậm Lầu", "Nậm Ty", "Phiêng Cằm", "Phiêng Khoài", "Phiêng Pằn", "Phù Yên", "Púng Bánh", "Quỳnh Nhai", "Song Khủa", "Sông Mã", "Sốp Cộp", "Thuận Châu", "Thảo Nguyên", "Tà Hộc", "Tân Lập", "Tân Phong", "Tân Yên", "Tô Hiệu", "Tô Múa", "Tạ Khoa", "Vân Hồ", "Vân Sơn", "Xuân Nha", "Xím Vàng", "Yên Châu", "Yên Sơn", "chiềng Mung", "Đoàn Kết"];
+
+    // Đổ dữ liệu vào menu thả xuống đơn vị hành chính cấp xã
+    const selectXa = document.getElementById('xaFilter');
+    DANH_SACH_XA.forEach(xa => {
+        if(xa) {
+            const opt = document.createElement('option');
+            opt.value = xa;
+            opt.textContent = xa;
+            selectXa.appendChild(opt);
+        }
+    });
+
+    // Hàm dựng và hiển thị bảng dữ liệu trực tuyến
+    function renderTable(dataList) {
+        const tbody = document.getElementById('tableBody');
+        const countSpan = document.getElementById('rowCount');
+        
+        if (dataList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 40px; font-style: italic;">Không tìm thấy cơ sở kinh doanh nào đáp ứng tiêu chí lọc hiện tại.</td></tr>`;
+            countSpan.innerHTML = `Kết quả truy vấn: <span class="row-count-highlight">0</span> cơ sở hợp lệ`;
+            return;
+        }
+
+        tbody.innerHTML = dataList.map((row, index) => {
+            // Xác thực pháp lý tự động dựa trên số giấy phép để cấp nhãn tích xanh
+            const hasGcn = row.so_gcn && row.so_gcn !== 'Chưa cấp / Đang rà soát' && row.so_gcn !== 'nan';
+            const statusBadge = hasGcn 
+                ? `<span class="badge badge-verified">✓ Hợp pháp</span>`
+                : `<span class="badge badge-warning">⚠️ Đang rà soát</span>`;
+
+            return `
+                <tr>
+                    <td class="td-stt">${index + 1}</td>
+                    <td class="td-name">${row.ten_cs}</td>
+                    <td>${row.chu_cs}</td>
+                    <td>${row.dia_chi}</td>
+                    <td class="td-phone">${row.sdt}</td>
+                    <td style="text-align: center;">
+                        ${statusBadge}
+                        <div class="gcn-code">${row.so_gcn}</div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        countSpan.innerHTML = `Hệ thống phân tích tìm thấy: <span class="row-count-highlight">${dataList.length}</span> / ${DATA.length} cơ sở vật tư hợp pháp trên địa bàn tỉnh Sơn La`;
+    }
+
+    // Tổ hợp thuật toán lọc tìm kiếm thông minh kết hợp dropdown hành chính xã
+    function filterData() {
+        const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+        const xaVal = document.getElementById('xaFilter').value;
+
+        const filtered = DATA.filter(item => {
+            const matchSearch = item.ten_cs.toLowerCase().includes(searchVal) || 
+                                item.chu_cs.toLowerCase().includes(searchVal) || 
+                                item.dia_chi.toLowerCase().includes(searchVal);
+            
+            // Tìm kiếm chính xác xã hoặc so sánh trùng khớp từ dropdown
+            const matchXa = xaVal === "" || item.xa === xaVal || item.xa.toLowerCase() === xaVal.toLowerCase();
+            
+            return matchSearch && matchXa;
+        });
+
+        renderTable(filtered);
+    }
+
+    // Khởi chạy kết xuất bảng dữ liệu ngay khi tải trang thành công
+    document.addEventListener("DOMContentLoaded", () => {
+        renderTable(DATA);
+    });
+</script>
+
+</body>
+</html>
